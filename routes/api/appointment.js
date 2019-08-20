@@ -73,4 +73,32 @@ router.get("/:oid", (req, res) => {
     });
 });
 
+//get appointment by cid
+router.get("/", (req, res) => {
+  const today = moment().startOf("day");
+
+  Appointment.find({
+    $and: [
+      { did: req.user.oid },
+      { cid: req.params.cid },
+      {
+        date: {
+          $gte: today.toDate(),
+          $lte: moment(today)
+            .endOf("day")
+            .toDate()
+        }
+      }
+    ]
+  })
+    .sort({ date: 1 })
+    .then(appointment => {
+      if (appointment) {
+        res.json(appointment);
+      } else {
+        return res.status(400).json({ error: "No Appointments" });
+      }
+    });
+});
+
 module.exports = router;

@@ -10,7 +10,11 @@ const passport = require("passport");
 // Register Users
 
 router.post("/register", (req, res) => {
-  Clients.findOne({ oid: req.body.oid }).then(client => {
+  Clients.findOneAndUpdate(
+    { oid: req.body.oid },
+    { picture: req.body.picture },
+    { new: true }
+  ).then(client => {
     if (req.body.mykey != "hello") {
       return res.status(400).json({ error: "key not match" });
     }
@@ -23,7 +27,7 @@ router.post("/register", (req, res) => {
         picture: client.picture
       };
       //Sign Token
-      jwt.sign(payload, keys.secretKey, { expiresIn: 7200 }, (err, token) => {
+      jwt.sign(payload, keys.secretKey, { expiresIn: 604800 }, (err, token) => {
         res.json({
           success: true,
           token: "Bearer " + token
@@ -50,7 +54,7 @@ router.post("/register", (req, res) => {
           jwt.sign(
             payload,
             keys.secretKey,
-            { expiresIn: 7200 },
+            { expiresIn: 604800 },
             (err, token) => {
               res.json({
                 success: true,

@@ -4,14 +4,18 @@ import PlacesAutocomplete from "react-places-autocomplete"; // getSelection // g
 import PropTypes from "prop-types";
 import {
   updateUserProfile,
-  getCurrentProfile
+  getCurrentProfile,
+  getProfileByOid
 } from "../../actions/profileAction";
-import { withRouter } from "react-router-dom";
-
+import { Link, withRouter } from "react-router-dom";
+import { Collapse, Modal } from "shards-react";
 import { cities } from "../../utils/cities";
+import { categories } from "../../utils/categories";
 import TextFieldGroup from "../common/TextFieldGroup";
 import Checkboxes from "../common/Checkboxes";
 import Spinner from "../common/Spinner";
+import classnames from "classnames";
+import TimeKeeper from "react-timekeeper";
 
 class Profile extends Component {
   constructor() {
@@ -35,7 +39,13 @@ class Profile extends Component {
       address: " ",
       description: "",
       bloodGroup: "",
-      errors: {}
+      errors: {},
+      open: false,
+      stime: false,
+      etime: false,
+      startTime: "12:15 am",
+      endTime: "12:15 am",
+      displayTimepicker: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -43,6 +53,38 @@ class Profile extends Component {
     this.onChange = this.onChange.bind(this);
     this.onCheck = this.onCheck.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
+    this.toggleTimeKeep = this.toggleTimeKeep.bind(this);
+    this.toggleTimekeeper = this.toggleTimekeeper.bind(this);
+  }
+
+  toggle(e) {
+    e.preventDefault();
+    this.setState({
+      open: !this.state.open
+    });
+  }
+
+  handleTimeChange(newTime) {
+    if (this.state.stime) this.setState({ startTime: newTime.formatted });
+    else if (this.state.etime) this.setState({ endTime: newTime.formatted });
+  }
+
+  toggleTimeKeep(e) {
+    this.setState({
+      displayTimepicker: !this.state.displayTimepicker,
+      [e.target.name]: true
+    });
+    console.log(this.state.stime);
+  }
+
+  toggleTimekeeper() {
+    this.setState({
+      displayTimepicker: !this.state.displayTimepicker,
+      stime: false,
+      etime: false
+    });
   }
 
   handleChange = area => {
@@ -79,67 +121,35 @@ class Profile extends Component {
     this.setState({ area: "" });
 
     if (this.props.auth.isAuthenticated) {
-      this.props.getCurrentProfile(this.props.history, this.props.location);
+      this.props.getProfileByOid(
+        this.props.auth.user.oid,
+        this.props.history,
+        this.props.location
+      );
     } else if (!this.props.auth.isAuthenticated) {
       this.props.history.push("/createprofile");
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.userprofile.profile) {
-      this.setState({
-        age: nextProps.userprofile.profile.age,
-        phone: nextProps.userprofile.profile.phone,
-        height: nextProps.userprofile.profile.height,
-        weight: nextProps.userprofile.profile.weight,
-        gender: nextProps.userprofile.profile.gender,
-        bloodGroup: nextProps.userprofile.profile.bloodGroup,
-        city: nextProps.userprofile.profile.city,
-        address: nextProps.userprofile.profile.address,
-        description: nextProps.userprofile.profile.description,
-        area: nextProps.userprofile.profile.area,
-        hypertension: nextProps.userprofile.profile.hypertension,
-        hypotension: nextProps.userprofile.profile.hypotension,
-        diabetic: nextProps.userprofile.profile.diabetic,
-        smoker: nextProps.userprofile.profile.smoker
-      });
-    } else {
-      this.setState({
-        area: "",
-        hypertension: false,
-        hypotension: false,
-        diabetic: false,
-        smoker: false
-      });
+      console.log("hello");
     }
   }
 
   onSubmit(e) {
     e.preventDefault();
     const userData = {
-      age: this.state.age,
       phone: this.state.phone,
       area: this.state.area,
       gender: this.state.gender,
-      bloodGroup: this.state.bloodGroup,
-      height: this.state.height,
-      weight: this.state.weight,
       city: this.state.city,
-      address: this.state.address,
-      description: this.state.description,
-      hypertension: this.state.hypertension,
-      hypotension: this.state.hypotension,
-      diabetic: this.state.diabetic,
-      smoker: this.state.smoker
+      address: this.state.address
     };
 
     this.props.updateUserProfile(userData);
   }
 
   render() {
+    console.log("A");
+
     const user = this.props.auth.user;
     let userImage;
-    const profile = this.props.userprofile.profile;
     let profileContents;
     let myarea = "asdasd";
     if (this.state.area !== undefined) {
@@ -147,7 +157,7 @@ class Profile extends Component {
     }
 
     if (this.props.auth.isAuthenticated) {
-      userImage = user.picture;
+      userImage = this.props.auth.user.picture;
     } else {
       userImage = require("../../images/user.png");
     }
@@ -165,8 +175,9 @@ class Profile extends Component {
     } = "";
 
     if (
-      this.props.userprofile.profile === null ||
-      this.props.userprofile.loading
+      this.props.docprofile.profiles === null ||
+      Object.keys(this.props.docprofile.profiles).length === 0 ||
+      this.props.docprofile.loading
     ) {
       profileContents = (
         <div className="main-content-container container-fluid px-4">
@@ -174,15 +185,10 @@ class Profile extends Component {
         </div>
       );
     } else {
-      age = profile.age;
-      phone = profile.phone;
-      key = profile.key;
-      gender = profile.gender;
-      bloodGroup = profile.bloodGroup;
-      height = profile.height;
-      weight = profile.weight;
-      city = profile.city;
-      address = profile.address;
+      phone = this.props.docprofile.profiles[0].phone;
+      gender = this.props.docprofile.profiles[0].gender;
+      city = this.props.docprofile.profiles[0].city;
+      address = this.props.docprofile.profiles[0].address;
       profileContents = (
         <div className="main-content-container container-fluid px-4">
           <div className="page-header row no-gutters py-4">
@@ -192,65 +198,7 @@ class Profile extends Component {
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4">
-              <div className="card card-small mb-4 pt-3">
-                <div className="card-header border-bottom text-center">
-                  <div className="mb-3 mx-auto">
-                    <img
-                      className="rounded-circle"
-                      src={userImage}
-                      alt=""
-                      width={110}
-                      height={110}
-                      style={{ objectFit: "cover" }}
-                    />{" "}
-                  </div>
-                  <h4 className="mb-0">{user.name}</h4>
-                  <span className="text-muted d-block mb-2">
-                    Project Manager
-                  </span>
-                  <button
-                    type="button"
-                    className="mb-2 btn btn-sm btn-pill btn-outline-primary mr-2"
-                  >
-                    <i className="material-icons mr-1">cached</i>Analysis
-                  </button>
-                </div>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item px-4">
-                    <div className="progress-wrapper">
-                      <strong className="text-muted d-block mb-2">
-                        Health
-                      </strong>
-                      <div className="progress progress-md">
-                        <div
-                          className="progress-bar bg-primary"
-                          role="progressbar"
-                          aria-valuenow={74}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          style={{ width: "74%" }}
-                        >
-                          <span className="progress-value">74%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="list-group-item p-4">
-                    <strong className="text-muted d-block mb-2">
-                      Description
-                    </strong>
-                    <span>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Odio eaque, quidem, commodi soluta qui quae minima
-                      obcaecati quod dolorum sint alias, possimus illum
-                      assumenda eligendi cumque?
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="col-lg-8">
+            <div className="col-lg-7">
               <div className="card card-small mb-4">
                 <div className="card-header border-bottom">
                   <h6 className="m-0">Account Details</h6>
@@ -306,18 +254,7 @@ class Profile extends Component {
                             />
                           </div>
                           <div className="form-row">
-                            <TextFieldGroup
-                              placeholder="Exp. 32"
-                              id="feAge"
-                              type="number"
-                              label="Age"
-                              name="age"
-                              defaultValue={age}
-                              divClass="form-group col-md-4"
-                              labelHtmlFor="feAge"
-                              onChange={this.onChange}
-                            />
-                            <div className="form-group col-md-4">
+                            <div className="form-group col-md-6">
                               <label htmlFor="feInputState">Gender</label>
                               <select
                                 id="feInputState"
@@ -332,175 +269,70 @@ class Profile extends Component {
                                 <option>Others</option>
                               </select>
                             </div>
-                            <div className="form-group col-md-4">
-                              <label htmlFor="feInputBlood">Blood Group</label>
-                              <select
-                                id="feInputBlood"
-                                defaultValue={"DEFAULT"}
-                                className="form-control"
-                                name="bloodGroup"
-                                onChange={this.onChange}
-                              >
-                                <option value="DEFAULT">{bloodGroup}</option>
-                                <option>A+</option>
-                                <option>A-</option>
-                                <option>B+</option>
-                                <option>B-</option>
-                                <option>AB+</option>
-                                <option>AB-</option>
-                                <option>O+</option>
-                                <option>O-</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="form-row">
-                            <TextFieldGroup
-                              placeholder="Exp. 5.6"
-                              id="feHeight"
-                              type="number"
-                              name="height"
-                              label="Height (Ft)"
-                              defaultValue={height}
-                              divClass="form-group col-md-6"
-                              labelHtmlFor="feHeight"
-                              onChange={this.onChange}
-                            />
-                            <TextFieldGroup
-                              placeholder="Exp. 60"
-                              id="feWeight"
-                              type="number"
-                              name="weight"
-                              label="Weight (Kg)"
-                              defaultValue={weight}
-                              divClass="form-group col-md-6"
-                              labelHtmlFor="feWeight"
-                              onChange={this.onChange}
-                            />
-                          </div>
-                          <div className="form-row">
-                            <div className="form-group col-md-4">
-                              <label htmlFor="feInputCity">City</label>
+                            <div className="form-group col-md-6">
+                              <label htmlFor="feInputCity">Category</label>
                               <select
                                 id="feInputCity"
-                                defaultValue={"DEFAULT"}
+                                defaultValue={
+                                  this.props.docprofile.profiles[0].category
+                                }
                                 className="form-control"
                                 name="city"
                                 onChange={this.onChange}
                               >
                                 <option value="DEFAULT">{city}</option>
-                                {cities.map(function(name, index) {
+                                {categories.map(function(name, index) {
                                   return <option key={index}>{name}</option>;
                                 })}
                               </select>
                             </div>
-                            <div className="form-group col-md-8">
-                              <label htmlFor="feInputCity">Area</label>
-                              <PlacesAutocomplete
-                                value={myarea}
-                                onChange={this.handleChange}
-                                onSelect={this.handleSelect}
-                              >
-                                {({
-                                  getInputProps,
-                                  suggestions,
-                                  getSuggestionItemProps,
-                                  loading
-                                }) => (
-                                  <div>
-                                    <input
-                                      {...getInputProps({
-                                        placeholder: "Search Places ...",
-                                        className:
-                                          "location-search-input form-control"
-                                      })}
-                                    />
-                                    <div className="autocomplete-dropdown-container">
-                                      {loading && <div>Loading...</div>}
-                                      {suggestions.map(suggestion => {
-                                        const className = suggestion.active
-                                          ? "suggestion-item--active"
-                                          : "suggestion-item";
-                                        // inline style for demonstration purpose
-                                        const style = suggestion.active
-                                          ? {
-                                              backgroundColor: "#fafafa",
-                                              cursor: "pointer"
-                                            }
-                                          : {
-                                              backgroundColor: "#ffffff",
-                                              cursor: "pointer"
-                                            };
-                                        return (
-                                          <div
-                                            {...getSuggestionItemProps(
-                                              suggestion,
-                                              {
-                                                className,
-                                                style
-                                              }
-                                            )}
-                                          >
-                                            <span>
-                                              {suggestion.description}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                )}
-                              </PlacesAutocomplete>
-                            </div>
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="feInputAddress">Address</label>
-                            <input
-                              type="text"
-                              name="address"
-                              className="form-control"
-                              id="feInputAddress"
-                              defaultValue={address}
-                              onChange={this.onChange}
-                              placeholder="Exp: House#321 Road 18"
-                            />{" "}
-                          </div>
-                          <div className="form-row">
-                            <Checkboxes
-                              name="hypertension"
-                              label="High Perssure"
-                              onClick={this.onCheck}
-                              checked={this.state.hypertension}
-                            />
-                            <Checkboxes
-                              name="hypotension"
-                              label="Low Perssure"
-                              onClick={this.onCheck}
-                              checked={this.state.hypotension}
-                            />
-                            <Checkboxes
-                              name="diabetic"
-                              label="Diabetic"
-                              onClick={this.onCheck}
-                              checked={this.state.diabetic}
-                            />
-                            <Checkboxes
-                              name="smoker"
-                              label="Smoker"
-                              onClick={this.onCheck}
-                              checked={this.state.smoker}
-                            />
                           </div>
                           <div className="form-row">
                             <div className="form-group col-md-12">
-                              <label htmlFor="feDescription">
-                                Informations
+                              <label htmlFor="feInputAddress">
+                                Specializations
                               </label>
-                              <textarea
+                              <input
+                                type="text"
+                                name="address"
+                                className="form-control"
+                                id="feInputAddress"
+                                defaultValue={
+                                  this.props.docprofile.profiles[0]
+                                    .specializations
+                                }
+                                onChange={this.onChange}
+                                placeholder="Exp: House#321 Road 18"
+                              />{" "}
+                            </div>
+                          </div>
+                          <div className="form-row">
+                            <div className="form-group col-md-12">
+                              <label htmlFor="feDescription">Education</label>
+                              <input
+                                type="text"
+                                id="feInputEducation"
                                 className="form-control"
                                 name="description"
                                 onChange={this.onChange}
-                                rows={5}
-                                value={this.state.description}
+                                defaultValue={
+                                  this.props.docprofile.profiles[0].education
+                                }
+                                placeholder="Exp: House#321 Road 18"
+                              />
+                            </div>
+                            <div className="form-group col-md-12">
+                              <label htmlFor="feDescription">Designation</label>
+                              <input
+                                type="text"
+                                id="feInputDesignation"
+                                className="form-control"
+                                name="description"
+                                onChange={this.onChange}
+                                defaultValue={
+                                  this.props.docprofile.profiles[0].designation
+                                }
+                                placeholder="Exp: House#321 Road 18"
                               />
                             </div>
                           </div>
@@ -518,6 +350,85 @@ class Profile extends Component {
                 </ul>
               </div>
             </div>
+            <div className="col-lg-5">
+              {this.props.docprofile.profiles[0].chambers.map(
+                (chamber, key) => (
+                  <div className="card card-small mb-4">
+                    <div style={{ textAlign: "left" }}>
+                      <ul className="list-group list-group-flush">
+                        <li
+                          className="list-group-item px-3"
+                          style={{ display: "flex" }}
+                        >
+                          <p key={key} style={{ width: "50%" }}>
+                            <b>Chamber no: {key + 1}</b>
+                          </p>
+                          <Link
+                            to="/addChamber"
+                            style={{ width: "50%", textAlign: "right" }}
+                          >
+                            <i
+                              class="fas fa-edit"
+                              style={{
+                                paddingTop: "3px"
+                              }}
+                            />
+                          </Link>
+                        </li>
+                        <li className="list-group-item px-3">
+                          <p>
+                            <b>
+                              Hospital: {chamber.name + "" + chamber.location}
+                            </b>
+                          </p>
+                        </li>
+                        <li className="list-group-item px-3">
+                          <p>
+                            <b>Address: {chamber.address} </b>
+                          </p>
+                        </li>
+                        <li className="list-group-item px-3">
+                          <p>
+                            <b>
+                              Days:{" "}
+                              {chamber.days.map(
+                                (day, keys) =>
+                                  day.charAt(0).toUpperCase() +
+                                  day.slice(1).toLowerCase() +
+                                  " "
+                              )}{" "}
+                            </b>
+                          </p>
+                        </li>
+                        <li className="list-group-item px-3">
+                          <p>
+                            <b style={{ marginRight: "1rem" }}>
+                              {parseInt(chamber.from, 10) > 12
+                                ? parseInt(chamber.from, 10) - 12 + " pm "
+                                : chamber.from + " am"}{" "}
+                              -{" "}
+                              {parseInt(chamber.to, 10) > 12
+                                ? parseInt(chamber.to, 10) - 12 + " pm"
+                                : chamber.to + " am"}{" "}
+                            </b>
+                            <b>{"Fee: " + chamber.fee} </b>
+                          </p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )
+              )}
+              <Link to="/addchamber">
+                <button
+                  className="btn btn-accent"
+                  style={{ width: "100%" }}
+                  noValidate
+                >
+                  Add Chambers
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       );
@@ -528,16 +439,18 @@ class Profile extends Component {
 
 Profile.propTypes = {
   getCurrentProfile: PropTypes.func.isRequired,
-  updateUserProfile: PropTypes.func.isRequired
+  updateUserProfile: PropTypes.func.isRequired,
+  getProfileByOid: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
   errors: state.errors,
-  userprofile: state.userprofile
+  userprofile: state.userprofile,
+  docprofile: state.docprofile
 });
 
 export default connect(
   mapStateToProps,
-  { getCurrentProfile, updateUserProfile }
+  { getCurrentProfile, updateUserProfile, getProfileByOid }
 )(withRouter(Profile));

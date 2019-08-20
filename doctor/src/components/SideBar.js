@@ -95,7 +95,7 @@ class SideBar extends Component {
               <li className="nav-item">
                 <a className="nav-link " href="add-new-post.html">
                   <i className="material-icons">note_add</i>
-                  <span>Find Pharmacy </span>
+                  <span>Patients </span>
                 </a>
               </li>
               <li className="nav-item">
@@ -106,20 +106,8 @@ class SideBar extends Component {
                   to="/prescriptions"
                 >
                   <i className="material-icons">view_module</i>
-                  <span>My Prescriptions</span>
+                  <span>Chambers</span>
                 </Link>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link " href="tables.html">
-                  <i className="material-icons">table_chart</i>
-                  <span>My Medicines</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link " href="user-profile-lite.html">
-                  <i className="material-icons">person</i>
-                  <span>Ambulance Service</span>
-                </a>
               </li>
               <li className="nav-item">
                 <a className="nav-link " href="errors.html">

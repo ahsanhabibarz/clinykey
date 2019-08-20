@@ -37,6 +37,7 @@ class Prescriptions extends React.Component {
   }
 
   render() {
+    console.log("P");
     const prescriptions = this.props.userprofile.prescriptions;
     let presList;
 
@@ -182,7 +183,7 @@ class Prescriptions extends React.Component {
                       <div className="col-lg-4 col-md-6 col-sm-12 pl-0">
                         <h6>Tests</h6>
                         {post.tests.map((test, id) => (
-                          <p>
+                          <p key={id}>
                             {id + 1 + ". "} {test}
                           </p>
                         ))}
@@ -190,7 +191,7 @@ class Prescriptions extends React.Component {
                       <div className="col-lg-4 col-md-6 col-sm-12 pl-0">
                         <h6>Advices</h6>
                         {post.advices.map((advice, id) => (
-                          <p>
+                          <p key={id}>
                             {id + 1 + ". "} {advice}
                           </p>
                         ))}

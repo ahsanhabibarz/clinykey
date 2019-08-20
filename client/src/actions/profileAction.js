@@ -41,7 +41,6 @@ export const getCurrentProfile = (history, location) => dispatch => {
     if (Object.keys(res.data).length > 0) {
       localStorage.setItem("myprofile", JSON.stringify(res.data));
       dispatch(setProfile(res.data));
-      history.push("/profile");
     } else {
       dispatch({
         type: GET_PROFILE,

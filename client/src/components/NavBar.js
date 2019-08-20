@@ -276,7 +276,7 @@ class NavBar extends Component {
         <FacebookLogin
           appId="2335728843382570"
           autoLoad={false}
-          fields="name,email,picture.type(large)"
+          fields="name,email,picture.width(250)"
           callback={this.responseFacebook}
         />
       );

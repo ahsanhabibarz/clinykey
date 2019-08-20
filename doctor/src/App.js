@@ -14,10 +14,10 @@ import NavBar from "./components/NavBar";
 import store from "./store";
 import Profile from "./components/pages/Profile";
 import CreateProfile from "./components/pages/CreateProfile";
-import DoctorsList from "./components/pages/DoctorsList";
-import Doctor from "./components/pages/Doctor";
+import ChamberList from "./components/pages/ChamberList";
+import MyPatients from "./components/pages/MyPatients";
 import Prescriptions from "./components/pages/Prescriptions";
-import Clinydoc from "./components/pages/Clinydoc";
+import AddChamber from "./components/pages/AddChamber";
 
 if (localStorage.jwtToken) {
   // Set auth token header auth
@@ -54,10 +54,11 @@ function App() {
               <main className="main-content col-lg-10 col-md-9 col-sm-12 p-0 offset-lg-2 offset-md-3">
                 <NavBar />
                 <Route exact path="/profile" component={Profile} />
+                <Route exact path="/addchamber" component={AddChamber} />
                 <Route exact path="/createprofile" component={CreateProfile} />
-                <Route exact path="/" component={DoctorsList} />
+                <Route exact path="/" component={ChamberList} />
                 <Route exact path="/prescriptions" component={Prescriptions} />
-                <Route exact path="/doctor/:oid" component={Doctor} />
+                <Route exact path="/mypatients/:cid" component={MyPatients} />
               </main>
             </div>
           </div>

@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PlacesAutocomplete from "react-places-autocomplete"; // getSelection // geocodeByAddress,
 import PropTypes from "prop-types";
-import {
-  createUserProfile,
-  getCurrentProfile
-} from "../../actions/profileAction";
+import { getProfileByOid } from "../../actions/profileAction";
 import { withRouter } from "react-router-dom";
 
 import { cities } from "../../utils/cities";
@@ -75,7 +72,7 @@ class CreateProfile extends Component {
 
   componentDidMount() {
     if (this.props.auth.isAuthenticated) {
-      this.props.getCurrentProfile(this.props.history, this.props.location);
+      this.props.getProfileByOid(this.props.auth.user.oid, this.props.history);
     }
   }
 
@@ -421,8 +418,7 @@ class CreateProfile extends Component {
 }
 
 CreateProfile.propTypes = {
-  createUserProfile: PropTypes.func.isRequired,
-  getCurrentProfile: PropTypes.func.isRequired
+  getProfileByOid: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -433,5 +429,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { createUserProfile, getCurrentProfile }
+  { getProfileByOid }
 )(withRouter(CreateProfile));

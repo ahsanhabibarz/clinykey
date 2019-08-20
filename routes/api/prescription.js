@@ -40,11 +40,11 @@ router.get(
       },
       { $unwind: "$doc_info" }, // $unwind used for getting data in object or for one record only
       // define some conditions here
-      // {
-      //     $match:{
-      //         $and:[{"userName" : "admin"}]
-      //     }
-      // },
+      {
+        $match: {
+          pid: req.user.oid
+        }
+      },
       // define which fields are you want to fetch
       {
         $project: {

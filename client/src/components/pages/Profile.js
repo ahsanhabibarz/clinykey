@@ -137,6 +137,8 @@ class Profile extends Component {
   }
 
   render() {
+    console.log("C");
+
     const user = this.props.auth.user;
     let userImage;
     const profile = this.props.userprofile.profile;

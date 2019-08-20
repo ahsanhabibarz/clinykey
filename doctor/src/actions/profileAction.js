@@ -41,7 +41,9 @@ export const getCurrentProfile = (history, location) => dispatch => {
     if (Object.keys(res.data).length > 0) {
       localStorage.setItem("myprofile", JSON.stringify(res.data));
       dispatch(setProfile(res.data));
-      history.push("/profile");
+      if (location !== "/profile") {
+        history.push("/profile");
+      }
     } else {
       dispatch({
         type: GET_PROFILE,
@@ -106,16 +108,46 @@ export const getProfilesBySearch = sarchkey => dispatch => {
     );
 };
 
-export const getProfileByOid = oid => dispatch => {
+export const getProfileByOid = (oid, history, location) => dispatch => {
   dispatch(setProfileLoading());
   axios
     .get(`/api/doctor/profile/${oid}`)
-    .then(res =>
+    .then(res => {
+      console.log(res.data);
+      if (Object.keys(res.data).length > 0) {
+        dispatch({
+          type: GET_DOCTORS_PROFILES,
+          payload: res.data
+        });
+      } else {
+        history.push("/createprofile");
+        console.log("else");
+      }
+    })
+    .catch(err =>
       dispatch({
         type: GET_DOCTORS_PROFILES,
-        payload: res.data
+        payload: null
       })
-    )
+    );
+};
+
+export const getProfileByOidChamber = (oid, history) => dispatch => {
+  dispatch(setProfileLoading());
+  axios
+    .get(`/api/doctor/profile/${oid}`)
+    .then(res => {
+      console.log(res.data);
+      if (Object.keys(res.data).length > 0) {
+        dispatch({
+          type: GET_DOCTORS_PROFILES,
+          payload: res.data
+        });
+      } else {
+        history.push("/createprofile");
+        console.log("else");
+      }
+    })
     .catch(err =>
       dispatch({
         type: GET_DOCTORS_PROFILES,

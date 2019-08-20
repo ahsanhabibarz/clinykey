@@ -21,7 +21,7 @@ export default function Spinner() {
         preserveAspectRatio="xMidYMid"
         style={{ background: "none" }}
       >
-        <circle cx="24" cy="48.4263" r="6.5" fill="#b00">
+        <circle cx="24" cy="48.4263" r="6.5" fill="#34A853">
           <animate
             attributeName="cy"
             calcMode="spline"
@@ -33,7 +33,7 @@ export default function Spinner() {
             begin="-0.5s"
           />
         </circle>{" "}
-        <circle cx="42" cy="62.5" r="6.5" fill="#b00">
+        <circle cx="42" cy="62.5" r="6.5" fill="#34A853">
           <animate
             attributeName="cy"
             calcMode="spline"
@@ -45,7 +45,7 @@ export default function Spinner() {
             begin="-0.375s"
           />
         </circle>{" "}
-        <circle cx="59" cy="62.5" r="6.5" fill="#b00">
+        <circle cx="59" cy="62.5" r="6.5" fill="#34A853">
           <animate
             attributeName="cy"
             calcMode="spline"
@@ -57,7 +57,7 @@ export default function Spinner() {
             begin="-0.25s"
           />
         </circle>{" "}
-        <circle cx="76" cy="62.5" r="6.5" fill="#b00">
+        <circle cx="76" cy="62.5" r="6.5" fill="#34A853">
           <animate
             attributeName="cy"
             calcMode="spline"
