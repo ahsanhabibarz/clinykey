@@ -68,36 +68,33 @@ class ChamberList extends React.Component {
                     <CardBody className="p-4">
                       <div>
                         <div>
-                          <p className="card-text font-weight-bold mb-0">
-                            {" "}
-                            Chamber Name :
-                            {" " + chamber.name + " - " + chamber.location}
-                          </p>
+                          <p className="headingText">{chamber.name}</p>
+                          <span className="descriptionText">
+                            {chamber.area}
+                          </span>
+                          <div className="mb-2">
+                            <span className="mr-2 mb-0 descriptionText">
+                              {chamber.from > 12
+                                ? chamber.from - 12 + " PM"
+                                : chamber.from + " AM"}{" "}
+                              -{" "}
+                              {chamber.to > 12
+                                ? chamber.to - 12 + " PM"
+                                : chamber.to + " AM"}
+                            </span>{" "}
+                            <span className="descriptionText mb-0">
+                              {" "}
+                              {" " + chamber.fee + " Taka"}
+                            </span>
+                          </div>
                           <div>
-                            <span>Visiting Days : </span>
                             {chamber.days.map((day, id) => (
-                              <span key={id} className="card-text mb-0">
-                                {day.substring(0, 3).toUpperCase() + " "}
+                              <span key={id} className="days mr-2">
+                                {day.substring(0, 1).toUpperCase() +
+                                  day.substring(1, 3) +
+                                  " "}
                               </span>
                             ))}
-                            <div>
-                              <p className="mr-2 mb-0 card-text">
-                                Time :{" "}
-                                {chamber.from > 12
-                                  ? chamber.from - 12 + " PM"
-                                  : chamber.from + " AM"}{" "}
-                                -{" "}
-                                {chamber.to > 12
-                                  ? chamber.to - 12 + " PM"
-                                  : chamber.to + " AM"}
-                              </p>{" "}
-                            </div>
-                            <div>
-                              <span className="card-text mb-0">
-                                {" "}
-                                Fee :{" " + chamber.fee + " Taka"}
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>

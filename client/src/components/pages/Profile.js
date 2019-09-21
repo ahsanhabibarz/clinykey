@@ -12,6 +12,7 @@ import { cities } from "../../utils/cities";
 import TextFieldGroup from "../common/TextFieldGroup";
 import Checkboxes from "../common/Checkboxes";
 import Spinner from "../common/Spinner";
+import Bmi from "../../utils/calculator";
 
 class Profile extends Component {
   constructor() {
@@ -197,20 +198,17 @@ class Profile extends Component {
             <div className="col-lg-4">
               <div className="card card-small mb-4 pt-3">
                 <div className="card-header border-bottom text-center">
-                  <div className="mb-3 mx-auto">
+                  <div className="mb-2 mx-auto">
                     <img
                       className="rounded-circle"
                       src={userImage}
                       alt=""
-                      width={110}
-                      height={110}
+                      width={96}
+                      height={96}
                       style={{ objectFit: "cover" }}
                     />{" "}
                   </div>
-                  <h4 className="mb-0">{user.name}</h4>
-                  <span className="text-muted d-block mb-2">
-                    Project Manager
-                  </span>
+                  <h4 className="mb-2">{user.name}</h4>
                   <button
                     type="button"
                     className="mb-2 btn btn-sm btn-pill btn-outline-primary mr-2"
@@ -220,33 +218,8 @@ class Profile extends Component {
                 </div>
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item px-4">
-                    <div className="progress-wrapper">
-                      <strong className="text-muted d-block mb-2">
-                        Health
-                      </strong>
-                      <div className="progress progress-md">
-                        <div
-                          className="progress-bar bg-primary"
-                          role="progressbar"
-                          aria-valuenow={74}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          style={{ width: "74%" }}
-                        >
-                          <span className="progress-value">74%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="list-group-item p-4">
-                    <strong className="text-muted d-block mb-2">
-                      Description
-                    </strong>
-                    <span>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Odio eaque, quidem, commodi soluta qui quae minima
-                      obcaecati quod dolorum sint alias, possimus illum
-                      assumenda eligendi cumque?
+                    <span className="descriptionText">
+                      Body Mass Index : {Bmi(weight, height)}
                     </span>
                   </li>
                 </ul>

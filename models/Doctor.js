@@ -35,11 +35,8 @@ const DoctorSchema = new Schema({
     required: true
   },
   specializations: {
-    type: [String],
+    type: String,
     required: true
-  },
-  searchtags: {
-    type: [String]
   },
   education: {
     type: String,
@@ -64,8 +61,7 @@ const DoctorSchema = new Schema({
         required: true
       },
       location: {
-        type: String,
-        required: true
+        type: String
       },
       area: {
         type: String,
@@ -80,11 +76,11 @@ const DoctorSchema = new Schema({
         required: true
       },
       from: {
-        type: Date,
+        type: String,
         required: true
       },
       to: {
-        type: Date,
+        type: String,
         required: true
       },
       days: {
@@ -94,6 +90,12 @@ const DoctorSchema = new Schema({
       description: {
         type: String
       }
+    }
+  ],
+  rating: [
+    {
+      patientID: String,
+      rate: Number
     }
   ],
   date: {

@@ -11,6 +11,7 @@ const doctor = require("./routes/api/doctor");
 const patient = require("./routes/api/patient");
 const appointment = require("./routes/api/appointment");
 const prescription = require("./routes/api/prescription");
+const scraper = require("./routes/api/scraper");
 
 const app = express();
 
@@ -34,6 +35,7 @@ require("./config/passport")(passport);
 
 app.use("/api", auth);
 app.use("/api/clients", clients);
+app.use("/api/scraper", scraper);
 app.use("/api/appointment", appointment);
 app.use("/api/prescription", prescription);
 app.use("/api/doctor", doctor);

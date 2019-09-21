@@ -29,3 +29,22 @@ export const getAppointments = oid => dispatch => {
       })
     );
 };
+
+export const getAppointmentsByCid = cid => dispatch => {
+  console.log(cid + "Ft");
+
+  axios
+    .get(`/api/appointment/chamber/${cid}`)
+    .then(res =>
+      dispatch({
+        type: GET_APPOINTMENTS,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_APPOINTMENTS,
+        payload: []
+      })
+    );
+};

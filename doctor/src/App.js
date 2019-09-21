@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUserOnTime } from "./actions/authActions";
-import { setProfile } from "./actions/profileAction";
+import { setDocProfile } from "./actions/profileAction";
 
 import SideBar from "./components/SideBar";
 import NavBar from "./components/NavBar";
@@ -18,6 +18,7 @@ import ChamberList from "./components/pages/ChamberList";
 import MyPatients from "./components/pages/MyPatients";
 import Prescriptions from "./components/pages/Prescriptions";
 import AddChamber from "./components/pages/AddChamber";
+import Prescribe from "./components/pages/Prescribe";
 
 if (localStorage.jwtToken) {
   // Set auth token header auth
@@ -39,8 +40,8 @@ if (localStorage.jwtToken) {
   }
 }
 
-if (localStorage.myprofile) {
-  store.dispatch(setProfile(JSON.parse(localStorage.myprofile)));
+if (localStorage.mydocprofile) {
+  store.dispatch(setDocProfile(JSON.parse(localStorage.mydocprofile)));
 }
 
 function App() {
@@ -59,6 +60,11 @@ function App() {
                 <Route exact path="/" component={ChamberList} />
                 <Route exact path="/prescriptions" component={Prescriptions} />
                 <Route exact path="/mypatients/:cid" component={MyPatients} />
+                <Route
+                  exact
+                  path="/prescribe/:cid/:pid"
+                  component={Prescribe}
+                />
               </main>
             </div>
           </div>

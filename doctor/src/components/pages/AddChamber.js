@@ -2,11 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PlacesAutocomplete from "react-places-autocomplete"; // getSelection // geocodeByAddress,
 import PropTypes from "prop-types";
-import {
-  updateUserProfile,
-  getCurrentProfile,
-  getProfileByOidChamber
-} from "../../actions/profileAction";
+import { addChamber } from "../../actions/profileAction";
 import { withRouter } from "react-router-dom";
 import { Collapse, Modal } from "shards-react";
 import { cities } from "../../utils/cities";
@@ -21,24 +17,18 @@ class AddChamber extends Component {
   constructor() {
     super();
     this.state = {
-      userID: "",
-      name: "",
-      email: "",
-      picture: "",
-      area: "asdsad",
-      diabetic: false,
-      hypertension: false,
-      hypotension: false,
-      phone: "",
-      age: "",
-      gender: "",
-      height: "",
-      weight: "",
+      chamber: "",
       city: "",
-      smoker: false,
-      address: " ",
-      description: "",
-      bloodGroup: "",
+      area: "Choose",
+      address: "",
+      fee: "",
+      sunday: false,
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      saturday: false,
+      friday: false,
       errors: {},
       open: false,
       stime: false,
@@ -76,7 +66,6 @@ class AddChamber extends Component {
       displayTimepicker: !this.state.displayTimepicker,
       [e.target.name]: true
     });
-    console.log(this.state.stime);
   }
 
   toggleTimekeeper() {
@@ -93,7 +82,6 @@ class AddChamber extends Component {
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
-    console.log(this.state);
   }
 
   handleSelect = area => {
@@ -105,27 +93,26 @@ class AddChamber extends Component {
   };
 
   onCheck(e) {
-    if (e.target.name === "hypertension") {
-      this.setState({ hypertension: !this.state.hypertension });
-    } else if (e.target.name === "hypotension") {
-      this.setState({ hypotension: !this.state.hypotension });
-    } else if (e.target.name === "diabetic") {
-      this.setState({ diabetic: !this.state.diabetic });
-    } else if (e.target.name === "smoker") {
-      this.setState({ smoker: !this.state.smoker });
+    if (e.target.name === "sunday") {
+      this.setState({ sunday: !this.state.sunday });
+    } else if (e.target.name === "monday") {
+      this.setState({ monday: !this.state.monday });
+    } else if (e.target.name === "tuesday") {
+      this.setState({ tuesday: !this.state.tuesday });
+    } else if (e.target.name === "wednesday") {
+      this.setState({ wednesday: !this.state.wednesday });
+    } else if (e.target.name === "thursday") {
+      this.setState({ thursday: !this.state.thursday });
+    } else if (e.target.name === "friday") {
+      this.setState({ friday: !this.state.friday });
+    } else if (e.target.name === "saturday") {
+      this.setState({ saturday: !this.state.saturday });
     }
-    console.log(this.state);
   }
 
   componentDidMount() {
     this.setState({ area: "" });
-
-    if (this.props.auth.isAuthenticated) {
-      this.props.getProfileByOidChamber(
-        this.props.auth.user.oid,
-        this.props.history
-      );
-    } else if (!this.props.auth.isAuthenticated) {
+    if (!this.props.auth.isAuthenticated) {
       this.props.history.push("/createprofile");
       console.log("hello");
     }
@@ -133,44 +120,36 @@ class AddChamber extends Component {
 
   onSubmit(e) {
     e.preventDefault();
+
+    let days = [];
+
+    if (this.state.sunday) days.push("sunday");
+    if (this.state.monday) days.push("monday");
+    if (this.state.tuesday) days.push("tuesday");
+    if (this.state.wednesday) days.push("wednesday");
+    if (this.state.thursday) days.push("thursday");
+    if (this.state.friday) days.push("friday");
+    if (this.state.saturday) days.push("saturday");
+
     const userData = {
-      phone: this.state.phone,
+      cid: Object.keys(this.props.docprofile.profiles[0].chambers).length + 1,
+      name: this.state.chamber,
       area: this.state.area,
-      gender: this.state.gender,
       city: this.state.city,
-      address: this.state.address
+      address: this.state.address,
+      fee: this.state.fee,
+      from: this.state.startTime,
+      to: this.state.endTime,
+      days: days
     };
 
-    this.props.updateUserProfile(userData);
+    console.log(userData);
+
+    this.props.addChamber(userData, this.props.history);
   }
 
   render() {
-    const user = this.props.auth.user;
-    let userImage;
     let profileContents;
-    let myarea = "asdasd";
-    if (this.state.area !== undefined) {
-      myarea = this.state.area;
-    }
-
-    if (this.props.auth.isAuthenticated) {
-      userImage = this.props.auth.user.picture;
-    } else {
-      userImage = require("../../images/user.png");
-    }
-
-    let {
-      age,
-      phone,
-      key,
-      gender,
-      bloodGroup,
-      height,
-      weight,
-      city,
-      address
-    } = "";
-
     if (
       this.props.docprofile.profiles === null ||
       Object.keys(this.props.docprofile.profiles).length === 0 ||
@@ -182,10 +161,6 @@ class AddChamber extends Component {
         </div>
       );
     } else {
-      phone = this.props.docprofile.profiles[0].phone;
-      gender = this.props.docprofile.profiles[0].gender;
-      city = this.props.docprofile.profiles[0].city;
-      address = this.props.docprofile.profiles[0].address;
       profileContents = (
         <div className="main-content-container container-fluid px-4">
           <div className="page-header row no-gutters py-4">
@@ -194,7 +169,7 @@ class AddChamber extends Component {
               <h3 className="page-title">Add Chamber</h3>
             </div>
           </div>
-          <div className="row p-4">
+          <div className="row pl-4 pr-4 pb-4 pt-0">
             <div className="card card-small col-12 mb-4">
               <div className="p-3" style={{ textAlign: "left" }}>
                 <form>
@@ -347,53 +322,57 @@ class AddChamber extends Component {
                       />
                     </div>
 
-                    <div className="form-row">
+                    <div className="row">
                       <Checkboxes
-                        name="hypertension"
+                        name="saturday"
                         label="Saturday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.saturday}
                       />
                       <Checkboxes
-                        name="hypertension"
+                        name="sunday"
                         label="Sunday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.sunday}
                       />
                       <Checkboxes
-                        name="hypertension"
+                        name="monday"
                         label="Monday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.monday}
                       />
                       <Checkboxes
-                        name="hypertension"
+                        name="tuesday"
                         label="Tuesday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.tuesday}
                       />
                       <Checkboxes
-                        name="hypertension"
+                        name="wednesday"
                         label="Wednesday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.wednesday}
                       />
                       <Checkboxes
-                        name="hypertension"
-                        label="Thrusday"
+                        name="thursday"
+                        label="Thursday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.thursday}
                       />
                       <Checkboxes
-                        name="hypertension"
+                        name="friday"
                         label="Friday"
                         onClick={this.onCheck}
-                        checked={this.state.hypertension}
+                        checked={this.state.friday}
                       />
                     </div>
                   </div>
                 </form>
-                <button type="button" className="btn btn-accent">
+                <button
+                  type="button"
+                  onClick={this.onSubmit}
+                  className="btn btn-accent"
+                >
                   Save Chamber
                 </button>
               </div>
@@ -407,9 +386,7 @@ class AddChamber extends Component {
 }
 
 AddChamber.propTypes = {
-  getCurrentProfile: PropTypes.func.isRequired,
-  updateUserProfile: PropTypes.func.isRequired,
-  getProfileByOidChamber: PropTypes.func.isRequired
+  addChamber: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -421,5 +398,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getCurrentProfile, updateUserProfile, getProfileByOidChamber }
+  { addChamber }
 )(withRouter(AddChamber));

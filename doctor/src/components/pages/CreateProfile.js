@@ -2,115 +2,57 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PlacesAutocomplete from "react-places-autocomplete"; // getSelection // geocodeByAddress,
 import PropTypes from "prop-types";
-import { getProfileByOid } from "../../actions/profileAction";
+import { updateUserProfile } from "../../actions/profileAction";
 import { withRouter } from "react-router-dom";
-
-import { cities } from "../../utils/cities";
+import { categories } from "../../utils/categories";
 import TextFieldGroup from "../common/TextFieldGroup";
-import Checkboxes from "../common/Checkboxes";
-//import Spinner from "../common/Spinner";
+import Spinner from "../common/Spinner";
 
 class CreateProfile extends Component {
   constructor() {
     super();
     this.state = {
-      userID: "",
-      name: "",
-      email: "",
-      picture: "",
-      area: "",
-      diabetic: false,
-      hypertension: false,
-      hypotension: false,
       phone: "",
-      age: "",
       gender: "",
-      height: "",
-      weight: "",
-      city: "",
-      smoker: false,
-      address: "",
-      description: "",
-      bloodGroup: "",
+      category: "",
+      specializations: "",
+      education: "",
+      designation: "",
       errors: {}
     };
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSelect = this.handleSelect.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.onCheck = this.onCheck.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
-
-  handleChange = area => {
-    this.setState({ area });
-  };
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
-  handleSelect = area => {
-    this.setState({ area });
-    // geocodeByAddress(address)
-    //   .then(results => getSelection(results[0]))
-    //   .then(latLng => console.log("Success", latLng))
-    //   .catch(error => console.error("Error", error));
-  };
-
-  onCheck(e) {
-    if (e.target.name === "hypertension") {
-      this.setState({ hypertension: !this.state.hypertension });
-    } else if (e.target.name === "hypotension") {
-      this.setState({ hypotension: !this.state.hypotension });
-    } else if (e.target.name === "diabetic") {
-      this.setState({ diabetic: !this.state.diabetic });
-    } else if (e.target.name === "smoker") {
-      this.setState({ smoker: !this.state.smoker });
-    }
-  }
-
-  componentDidMount() {
-    if (this.props.auth.isAuthenticated) {
-      this.props.getProfileByOid(this.props.auth.user.oid, this.props.history);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {}
+  componentDidMount() {}
 
   onSubmit(e) {
     e.preventDefault();
     const userData = {
-      age: this.state.age,
       phone: this.state.phone,
       gender: this.state.gender,
-      bloodGroup: this.state.bloodGroup,
-      height: this.state.height,
-      weight: this.state.weight,
-      city: this.state.city,
-      address: this.state.address,
-      description: this.state.description,
-      hypertension: this.state.hypertension,
-      hypotension: this.state.hypotension,
-      diabetic: this.state.diabetic,
-      smoker: this.state.smoker,
-      area: this.state.area,
-      picture: this.props.auth.user.picture
+      category: this.state.category,
+      education: this.state.education,
+      designation: this.state.designation,
+      specializations: this.state.specializations
     };
-
-    console.log(userData);
-
-    this.props.createUserProfile(userData, this.props.history);
+    this.props.updateUserProfile(
+      userData,
+      this.props.history,
+      this.props.location
+    );
   }
 
   render() {
     const user = this.props.auth.user;
     let profileContents;
-    let needToSet = false;
 
-    console.log(needToSet);
-
-    if (this.props.auth.isAuthenticated) {
+    if (this.props.auth.isAuthenticated && !this.props.docprofile.loading) {
       profileContents = (
         <div className="main-content-container container-fluid px-4">
           <div className="page-header row no-gutters py-4">
@@ -176,18 +118,7 @@ class CreateProfile extends Component {
                             />
                           </div>
                           <div className="form-row">
-                            <TextFieldGroup
-                              placeholder="Exp. 32"
-                              id="feAge"
-                              type="number"
-                              label="Age"
-                              name="age"
-                              defaultValue={this.state.age}
-                              divClass="form-group col-md-4"
-                              labelHtmlFor="feAge"
-                              onChange={this.onChange}
-                            />
-                            <div className="form-group col-md-4">
+                            <div className="form-group col-md-6">
                               <label htmlFor="feInputState">Gender</label>
                               <select
                                 id="feInputState"
@@ -196,191 +127,67 @@ class CreateProfile extends Component {
                                 name="gender"
                                 onChange={this.onChange}
                               >
-                                <option value="DEFAULT">{"Choose..."}</option>
+                                <option value="DEFAULT">Choose</option>
                                 <option>Male</option>
                                 <option>Female</option>
                                 <option>Others</option>
                               </select>
                             </div>
-                            <div className="form-group col-md-4">
-                              <label htmlFor="feInputBlood">Blood Group</label>
+                            <div className="form-group col-md-6">
+                              <label htmlFor="feInputCity">Category</label>
                               <select
-                                id="feInputBlood"
-                                defaultValue={"DEFAULT"}
+                                id="feInputCategory"
+                                defaultValue={"Choose"}
                                 className="form-control"
-                                name="bloodGroup"
+                                name="category"
                                 onChange={this.onChange}
                               >
-                                <option value="DEFAULT">{"Choose..."}</option>
-                                <option>A+</option>
-                                <option>A-</option>
-                                <option>B+</option>
-                                <option>B-</option>
-                                <option>AB+</option>
-                                <option>AB-</option>
-                                <option>O+</option>
-                                <option>O-</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="form-row">
-                            <TextFieldGroup
-                              placeholder="Exp. 5.6"
-                              id="feHeight"
-                              type="number"
-                              name="height"
-                              label="Height (Ft)"
-                              defaultValue={this.state.height}
-                              divClass="form-group col-md-6"
-                              labelHtmlFor="feHeight"
-                              onChange={this.onChange}
-                            />
-                            <TextFieldGroup
-                              placeholder="Exp. 60"
-                              id="feWeight"
-                              type="number"
-                              name="weight"
-                              label="Weight (Kg)"
-                              defaultValue={this.state.weight}
-                              divClass="form-group col-md-6"
-                              labelHtmlFor="feWeight"
-                              onChange={this.onChange}
-                            />
-                          </div>
-                          <div className="form-row">
-                            <div className="form-group col-md-4">
-                              <label htmlFor="feInputCity">City</label>
-                              <select
-                                id="feInputCity"
-                                defaultValue={"DEFAULT"}
-                                className="form-control"
-                                name="city"
-                                onChange={this.onChange}
-                              >
-                                <option value="DEFAULT">{"Choose..."}</option>
-                                {cities.map(function(name, index) {
+                                <option value="DEFAULT">{"Choose"}</option>
+                                {categories.map(function(name, index) {
                                   return <option key={index}>{name}</option>;
                                 })}
                               </select>
                             </div>
-                            <div className="form-group col-md-8">
-                              <label htmlFor="feInputCity">Area</label>
-                              <PlacesAutocomplete
-                                value={this.state.area}
-                                onChange={this.handleChange}
-                                onSelect={this.handleSelect}
-                              >
-                                {({
-                                  getInputProps,
-                                  suggestions,
-                                  getSuggestionItemProps,
-                                  loading
-                                }) => (
-                                  <div>
-                                    <input
-                                      {...getInputProps({
-                                        placeholder: "Search Places ...",
-                                        className:
-                                          "location-search-input form-control"
-                                      })}
-                                    />
-                                    <div className="autocomplete-dropdown-container">
-                                      {loading && <div>Loading...</div>}
-                                      {suggestions.map(suggestion => {
-                                        const className = suggestion.active
-                                          ? "suggestion-item--active"
-                                          : "suggestion-item";
-                                        // inline style for demonstration purpose
-                                        const style = suggestion.active
-                                          ? {
-                                              backgroundColor: "#fafafa",
-                                              cursor: "pointer"
-                                            }
-                                          : {
-                                              backgroundColor: "#ffffff",
-                                              cursor: "pointer"
-                                            };
-                                        return (
-                                          <div
-                                            {...getSuggestionItemProps(
-                                              suggestion,
-                                              {
-                                                className,
-                                                style
-                                              }
-                                            )}
-                                          >
-                                            <span>
-                                              {suggestion.description}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                )}
-                              </PlacesAutocomplete>
-                            </div>
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="feInputAddress">Address</label>
-                            <input
-                              type="text"
-                              name="address"
-                              className="form-control"
-                              id="feInputAddress"
-                              defaultValue={this.state.address}
-                              onChange={this.onChange}
-                              placeholder="Exp: House#321 Road 18"
-                            />{" "}
-                          </div>
-                          <div className="form-row">
-                            <Checkboxes
-                              name="hypertension"
-                              label="High Perssure"
-                              onClick={this.onCheck}
-                              checked={this.state.hypertension}
-                            />
-                            <Checkboxes
-                              name="hypotension"
-                              label="Low Perssure"
-                              onClick={this.onCheck}
-                              checked={this.state.hypotension}
-                            />
-                            <Checkboxes
-                              name="diabetic"
-                              label="Diabetic"
-                              onClick={this.onCheck}
-                              checked={this.state.diabetic}
-                            />
-                            <Checkboxes
-                              name="smoker"
-                              label="Smoker"
-                              onClick={this.onCheck}
-                              checked={this.state.smoker}
-                            />
                           </div>
                           <div className="form-row">
                             <div className="form-group col-md-12">
-                              <label htmlFor="feDescription" className="mb-0">
-                                Information
+                              <label htmlFor="feInputAddress">
+                                Specializations
                               </label>
-                              <p
-                                className="mb-2 font-weight-bold"
-                                style={{
-                                  fontSize: ".725rem",
-                                  color: "#b00"
-                                }}
-                              >
-                                Please describe if you have any kind of chronic
-                                diseases.{" "}
-                              </p>
-                              <textarea
+                              <input
+                                type="text"
+                                name="specializations"
                                 className="form-control"
-                                name="description"
+                                id="feInputAddress"
+                                defaultValue=""
                                 onChange={this.onChange}
-                                rows={5}
-                                value={this.state.description}
+                                placeholder="Exp: House#321 Road 18"
+                              />{" "}
+                            </div>
+                          </div>
+                          <div className="form-row">
+                            <div className="form-group col-md-12">
+                              <label htmlFor="feDescription">Education</label>
+                              <input
+                                type="text"
+                                id="feInputEducation"
+                                className="form-control"
+                                name="education"
+                                onChange={this.onChange}
+                                defaultValue={""}
+                                placeholder="Exp: House#321 Road 18"
+                              />
+                            </div>
+                            <div className="form-group col-md-12">
+                              <label htmlFor="feDescription">Designation</label>
+                              <input
+                                type="text"
+                                id="feInputDesignation"
+                                className="form-control"
+                                name="designation"
+                                onChange={this.onChange}
+                                defaultValue={""}
+                                placeholder="Exp: House#321 Road 18"
                               />
                             </div>
                           </div>
@@ -401,7 +208,10 @@ class CreateProfile extends Component {
           </div>
         </div>
       );
-    } else if (!this.props.auth.isAuthenticated) {
+    } else if (
+      !this.props.auth.isAuthenticated &&
+      !this.props.docprofile.loading
+    ) {
       profileContents = (
         <div className="main-content-container container-fluid px-4">
           <div className="page-header row no-gutters py-4">
@@ -412,22 +222,28 @@ class CreateProfile extends Component {
           </div>
         </div>
       );
+    } else if (this.props.docprofile.loading) {
+      profileContents = (
+        <div className="main-content-container container-fluid px-4">
+          <Spinner />
+        </div>
+      );
     }
     return profileContents;
   }
 }
 
 CreateProfile.propTypes = {
-  getProfileByOid: PropTypes.func.isRequired
+  updateUserProfile: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
   errors: state.errors,
-  userprofile: state.userprofile
+  docprofile: state.docprofile
 });
 
 export default connect(
   mapStateToProps,
-  { getProfileByOid }
+  { updateUserProfile }
 )(withRouter(CreateProfile));

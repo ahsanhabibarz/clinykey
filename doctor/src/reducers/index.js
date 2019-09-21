@@ -10,7 +10,7 @@ export default combineReducers({
   nav: navReducer,
   auth: authReducer,
   errors: errorReducer,
-  userprofile: profileReducer,
+  patientprofile: profileReducer,
   docprofile: docprofileReducers,
   appointment: appointmentReducers
 });

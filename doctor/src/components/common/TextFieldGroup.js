@@ -45,7 +45,8 @@ TextFieldGroup.propTypes = {
 
 TextFieldGroup.defaultProps = {
   type: "text",
-  inputClass: "form-control"
+  inputClass: "form-control",
+  autoComplete: "off"
 };
 
 export default TextFieldGroup;

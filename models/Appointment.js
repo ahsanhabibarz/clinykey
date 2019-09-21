@@ -17,6 +17,10 @@ const appointmentSchema = new Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  prescribed: {
+    type: Boolean,
+    default: false
   }
 });
 

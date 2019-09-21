@@ -1,12 +1,14 @@
 import {
   GET_PROFILE,
   PROFILE_LOADING,
-  GET_PRESCRIPTIONS
+  GET_PRESCRIPTIONS,
+  GET_MEDS
 } from "../actions/types";
 const initialState = {
   profile: null,
   prescriptions: null,
-  loading: false
+  loading: false,
+  meds: []
 };
 
 export default function(state = initialState, action) {
@@ -21,6 +23,11 @@ export default function(state = initialState, action) {
         ...state,
         profile: action.payload,
         loading: false
+      };
+    case GET_MEDS:
+      return {
+        ...state,
+        meds: action.payload
       };
     case GET_PRESCRIPTIONS:
       return {

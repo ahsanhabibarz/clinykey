@@ -6369,18 +6369,16 @@ html .ql-toolbar .ql-picker .ql-picker-options {
 .goodRating {
   background-color: #2e7d32;
 }
+.medRating {
+  background-color: #BF360C;
+}
 .badRating {
   background-color: #b00000;
 }
 
 .docProfileImage {
-  width: 5.5rem; 
-  height: 5.5rem; 
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;  
   display: block;
-  margin-top: 1.425rem;
-  margin-bottom: 0.512rem;
   object-fit: cover;
 }
 
@@ -6423,9 +6421,15 @@ html .ql-toolbar .ql-picker .ql-picker-options {
 }
 
 .days {
-  font-size: 0.8925rem;
-  color: #b00000;
-  font-weight: 620;
+  font-size: 13px;
+  background: #DDDDDD;
+  border-radius: 10px;
+  display: inline-block;
+  font-family: "Roboto" , Arial, Helvetica, sans-serif;
+  padding: 2px 12px 1px 12px;
+  color: #000;
+  font-weight: 600;
+  letter-spacing: .5px;
 }
 
 .time {
@@ -6662,4 +6666,17 @@ html .ql-toolbar .ql-picker .ql-picker-options {
 .testsDiv h6{
   font-weight: bold;
   color: black
+}
+
+.headingText{
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #0d0d0d;
+  font-weight: 700;
+}
+.descriptionText{
+  font-family: "Roboto" , Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #606060;
+  font-weight: 550;
 }

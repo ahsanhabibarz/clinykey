@@ -107,6 +107,22 @@ router.get(
   }
 );
 
+router.post(
+  "/id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Patient.findOne({ patientID: req.body.pid })
+      .then(patient => {
+        if (!patient) {
+          //return res.status(404).json({ Error: "Profile not found" });
+          return res.json({});
+        }
+        res.json(patient);
+      })
+      .catch(err => console.log(err + "backend"));
+  }
+);
+
 router.get("/profile/:handle", (req, res) => {
   Patient.findOne({ patientID: req.params.handle })
     .then(patient => {

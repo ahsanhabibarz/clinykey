@@ -17,7 +17,7 @@ const Checkboxes = ({ name, label, onClick, checked }) => {
     );
   } else {
     element = (
-      <div className="form-group col-md-3">
+      <div className="form-group col-md-3 ">
         <fieldset>
           <FormCheckbox name={name} onClick={onClick} checked={false}>
             {label}

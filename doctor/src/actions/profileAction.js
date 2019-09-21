@@ -3,20 +3,37 @@ import {
   GET_PROFILE,
   PROFILE_LOADING,
   GET_DOCTORS_PROFILES,
-  GET_PRESCRIPTIONS
+  GET_PRESCRIPTIONS,
+  GET_MEDS
 } from "./types";
 
-export const updateUserProfile = userData => dispatch => {
+export const updateUserProfile = (userData, history, location) => dispatch => {
   dispatch(setProfileLoading());
   axios
-    .post("/api/patient/profile/update", userData)
-    .then(res => dispatch(setProfile(res.data)))
-    .catch(err =>
+    .post("/api/doctor/profile/update", userData)
+    .then(res => {
+      if (location.pathname === "/createprofile") {
+        history.push("/profile");
+      }
       dispatch({
-        type: GET_PROFILE,
-        payload: {}
-      })
-    );
+        type: GET_DOCTORS_PROFILES,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+export const addChamber = (userData, history) => dispatch => {
+  axios
+    .post("/api/doctor/addchamber", userData)
+    .then(res => {
+      history.push("/profile");
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 export const createUserProfile = (userData, history) => dispatch => {
@@ -35,21 +52,34 @@ export const createUserProfile = (userData, history) => dispatch => {
     );
 };
 
-export const getCurrentProfile = (history, location) => dispatch => {
+export const getPatientProfile = pid => dispatch => {
   dispatch(setProfileLoading());
-  axios.get("/api/patient/profile").then(res => {
+  console.log(pid + "action");
+
+  axios.post("/api/patient/id", { pid }).then(res => {
     if (Object.keys(res.data).length > 0) {
-      localStorage.setItem("myprofile", JSON.stringify(res.data));
       dispatch(setProfile(res.data));
-      if (location !== "/profile") {
-        history.push("/profile");
-      }
     } else {
       dispatch({
         type: GET_PROFILE,
         payload: {}
       });
-      history.push("/createprofile");
+    }
+  });
+};
+
+export const getMedicinesSuggestion = med => dispatch => {
+  axios.post("/api/scraper", { med }).then(res => {
+    if (Object.keys(res.data).length > 0) {
+      dispatch({
+        type: GET_MEDS,
+        payload: res.data
+      });
+    } else {
+      dispatch({
+        type: GET_MEDS,
+        payload: []
+      });
     }
   });
 };
@@ -108,20 +138,24 @@ export const getProfilesBySearch = sarchkey => dispatch => {
     );
 };
 
+// Get Doctors Profile By Id
 export const getProfileByOid = (oid, history, location) => dispatch => {
   dispatch(setProfileLoading());
   axios
     .get(`/api/doctor/profile/${oid}`)
     .then(res => {
-      console.log(res.data);
       if (Object.keys(res.data).length > 0) {
+        localStorage.setItem("mydocprofile", JSON.stringify(res.data));
         dispatch({
           type: GET_DOCTORS_PROFILES,
           payload: res.data
         });
       } else {
         history.push("/createprofile");
-        console.log("else");
+        dispatch({
+          type: GET_DOCTORS_PROFILES,
+          payload: {}
+        });
       }
     })
     .catch(err =>
@@ -165,6 +199,12 @@ export const setProfileLoading = () => {
 export const setProfile = data => {
   return {
     type: GET_PROFILE,
+    payload: data
+  };
+};
+export const setDocProfile = data => {
+  return {
+    type: GET_DOCTORS_PROFILES,
     payload: data
   };
 };

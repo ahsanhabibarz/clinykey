@@ -115,6 +115,7 @@ router.get("/profile/all", (req, res) => {
   const errors = {};
 
   Doctor.aggregate([
+    { $match: { chambers: { $ne: [] } } },
     { $unwind: "$rating" },
     {
       $group: {
@@ -414,6 +415,185 @@ router.post(
         });
       }
     });
+  }
+);
+
+// Update or Create Doctor Profile
+router.post(
+  "/profile/update",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const profileFields = {};
+    profileFields.oid = req.user.oid;
+    profileFields.name = req.user.name;
+    profileFields.email = req.user.email;
+    profileFields.key = req.user.name + "this is a key";
+    if (req.body.phone) profileFields.phone = req.body.phone;
+    if (req.body.gender) {
+      profileFields.gender = req.body.gender;
+    }
+    profileFields.picture = req.user.picture;
+    if (req.body.education) profileFields.education = req.body.education;
+    if (req.body.designation) profileFields.designation = req.body.designation;
+    if (req.body.category) profileFields.category = req.body.category;
+    if (req.body.specializations)
+      profileFields.specializations = req.body.specializations;
+
+    profileFields.rating = { patientID: "A", rate: 10 };
+
+    Doctor.findOne({ oid: req.user.oid }).then(doctor => {
+      if (doctor) {
+        Doctor.findOneAndUpdate(
+          { oid: req.user.oid },
+          { $set: profileFields },
+          { new: true }
+        ).then(doctor => {
+          Doctor.aggregate([
+            { $unwind: "$rating" },
+            {
+              $group: {
+                _id: "$_id",
+                avgRate: { $avg: "$rating.rate" },
+                doc: { $first: "$$ROOT" }
+              }
+            },
+            {
+              $project: {
+                oid: "$doc.oid",
+                name: "$doc.name",
+                email: "$doc.email",
+                avgrating: "$avgRate",
+                picture: "$doc.picture",
+                key: "$doc.key",
+                phone: "$doc.phone",
+                gender: "$doc.gender",
+                category: "$doc.category",
+                specializations: "$doc.specializations",
+                education: "$doc.education",
+                designation: "$doc.designation",
+                chambers: "$doc.chambers",
+                date: "$doc.date",
+                rating: "$doc.rating"
+              }
+            },
+            {
+              $match: {
+                oid: doctor.oid
+              }
+            }
+          ])
+            .then(doctor => {
+              res.json(doctor);
+            })
+            .catch(err => res.status(404).json(err));
+        });
+      } else {
+        Doctor.findOne({ email: profileFields.email }).then(profile => {
+          if (profile) {
+            return res.status(400).json({ errors: "asdsaads" });
+          }
+          // Make new Profile
+          new Doctor(profileFields).save().then(doctor => {
+            Doctor.aggregate([
+              { $unwind: "$rating" },
+              {
+                $group: {
+                  _id: "$_id",
+                  avgRate: { $avg: "$rating.rate" },
+                  doc: { $first: "$$ROOT" }
+                }
+              },
+              {
+                $project: {
+                  oid: "$doc.oid",
+                  name: "$doc.name",
+                  email: "$doc.email",
+                  avgrating: "$avgRate",
+                  picture: "$doc.picture",
+                  key: "$doc.key",
+                  phone: "$doc.phone",
+                  gender: "$doc.gender",
+                  category: "$doc.category",
+                  specializations: "$doc.specializations",
+                  education: "$doc.education",
+                  designation: "$doc.designation",
+                  chambers: "$doc.chambers",
+                  date: "$doc.date",
+                  rating: "$doc.rating"
+                }
+              },
+              {
+                $match: {
+                  oid: doctor.oid
+                }
+              }
+            ])
+              .then(doctor => {
+                res.json(doctor);
+              })
+              .catch(err => res.status(404).json(err));
+          });
+        });
+      }
+    });
+  }
+);
+
+router.post(
+  "/addchamber",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Doctor.findOne({ oid: req.user.oid })
+      .then(profile => {
+        const newExp = {
+          cid: req.body.cid,
+          name: req.body.name,
+          area: req.body.area,
+          city: req.body.city,
+          address: req.body.address,
+          fee: req.body.fee,
+          from: req.body.from,
+          to: req.body.to,
+          days: req.body.days
+        };
+        //add to exp array
+        profile.chambers.unshift(newExp);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.status(400).json({ errors: err }));
+  }
+);
+
+router.post(
+  "/editchamber",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const newExp = {
+      cid: req.body.cid,
+      name: req.body.name,
+      area: req.body.area,
+      city: req.body.city,
+      address: req.body.address,
+      fee: req.body.fee,
+      from: req.body.startTime,
+      to: req.body.endTime,
+      days: ["Friday", "Saturday"]
+    };
+
+    Doctor.updateOne(
+      { oid: req.user.oid, "chambers.cid": req.body.cid },
+      { $set: { "chambers.$": newExp } }
+    )
+      .then(mod => {
+        if (mod.nModified != 0) {
+          res.json({ success: "modified" });
+        } else {
+          res.status(404).json({ errors: "Failed" });
+        }
+      })
+      .catch(err => {
+        res.status(404).json({ errors: "Failed" });
+      });
   }
 );
 

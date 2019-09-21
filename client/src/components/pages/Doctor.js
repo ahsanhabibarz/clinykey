@@ -72,31 +72,44 @@ class Doctor extends Component {
               <span className="text-uppercase page-subtitle">
                 Profile Overview
               </span>
-              <h3 className="page-title">{this.state.profile.name}</h3>
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4">
+            <div className="col-lg-6">
               <div className="card card-small mb-4 pt-2">
-                <div className="card-header border-bottom text-center">
-                  <div className="mb-3 mx-auto">
+                <div
+                  className="m-3 text-center"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "15% 85%"
+                  }}
+                >
+                  <div className="mx-auto" style={{ textAlign: "left" }}>
                     <img
                       className="rounded-circle"
                       src={this.state.profile.picture}
                       alt=""
-                      width={110}
-                      height={110}
+                      width={"100%"}
                       style={{ objectFit: "cover" }}
                     />{" "}
                   </div>
-                  <h5 className="text-danger d-block mb-2">
-                    Assistant Professor
-                  </h5>
-                </div>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item px-4">
-                    <div className="progress-wrapper">
-                      <strong className="text-dark d-block mb-2">Rating</strong>
+                  <div style={{ textAlign: "left", marginLeft: "1rem" }}>
+                    <span className="headingText">
+                      {this.state.profile.name}
+                    </span>
+                    <span className="descriptionText d-block mb-0">
+                      Assistant Professor
+                    </span>
+                    <span className="descriptionText d-block mb-0">
+                      {"Email: " + this.state.profile.email}
+                    </span>
+                    <span className="descriptionText d-block mb-0">
+                      {"Phone: " + this.state.profile.phone}
+                    </span>
+                    <div className="progress-wrapper mb-2">
+                      <span className="d-block mb-2 descriptionText">
+                        Rating
+                      </span>
                       <div className="progress progress-md">
                         <div
                           className="progress-bar bg-primary"
@@ -108,79 +121,63 @@ class Doctor extends Component {
                             width: this.state.profile.avgrating * 10 + "%"
                           }}
                         >
-                          <span className="progress-value text-dark font-weight-bold">
+                          <span className="progress-value text-dark">
                             {this.state.profile.avgrating * 10 + "%"}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </li>
-                  <li className="list-group-item px-4 pb-3">
-                    <i
-                      className="material-icons myicons mr-2 pt-1"
-                      datatoggle="tooltip"
-                      title="Email"
-                    >
-                      email
-                    </i>
-                    <span className="text-dark mdweight">
-                      {this.state.profile.email}
-                    </span>
-                  </li>
-                  <li className="list-group-item px-4 pb-4">
-                    <i
-                      className="material-icons myicons mr-2 pt-1"
-                      datatoggle="tooltip"
-                      title="Phone"
-                    >
-                      phone
-                    </i>
-                    <span className="text-dark mdweight">
-                      {this.state.profile.phone}
-                    </span>
-                  </li>
-                </ul>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="col-lg-8">
+            <div className="col-lg-6">
               <div className="card card-small mb-4 pt-1">
                 <ul className="list-group list-group-flush">
-                  <li className="list-group-item px-4">
-                    <strong className="text-dark d-block mb-1">Key</strong>
-                    <span className="text-dark mdweight">
-                      {this.state.profile.key}
-                    </span>
-                  </li>{" "}
-                  <li className="list-group-item px-4">
-                    <strong className="text-dark d-block mb-1">Category</strong>
-                    <span className="text-dark mdweight">
+                  <li className="list-group-item pt-2 pb-2 px-4">
+                    <span className="descriptionText">
+                      <b
+                        className="descriptionText"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
+                        Category :{" "}
+                      </b>
                       {this.state.profile.category}
                     </span>
                   </li>{" "}
-                  <li className="list-group-item px-4">
-                    <strong className="text-dark d-block mb-1">
-                      Education
-                    </strong>
-                    <span className="text-dark mdweight">
-                      {this.state.profile.education}
-                    </span>
-                  </li>
-                  <li className="list-group-item px-4">
-                    <strong className="text-dark d-block mb-1">
-                      Designation
-                    </strong>
-                    <span className="text-dark mdweight">
+                  <li className="list-group-item pt-2 pb-2 px-4">
+                    <span className="descriptionText">
+                      <b
+                        className="descriptionText"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
+                        Designation :{" "}
+                      </b>
                       {this.state.profile.designation}
                     </span>
-                  </li>
-                  <li className="list-group-item px-4">
-                    <strong className="text-dark d-block mb-1">
-                      Specializations
-                    </strong>
-                    <span className="text-dark mdweight">
+                  </li>{" "}
+                  <li className="list-group-item pt-2 pb-2 px-4">
+                    <span className="descriptionText">
+                      <b
+                        className="descriptionText"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
+                        Education :{" "}
+                      </b>
+                      {this.state.profile.education}
+                    </span>
+                  </li>{" "}
+                  <li className="list-group-item pt-2 pb-2 px-4">
+                    <span className="descriptionText">
+                      <b
+                        className="descriptionText"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
+                        Specializations :{" "}
+                      </b>
                       {this.state.profile.specializations}
                     </span>
-                  </li>
+                  </li>{" "}
                 </ul>
               </div>
             </div>
@@ -191,35 +188,36 @@ class Doctor extends Component {
                 <div className="card card-small mb-4 pt-1">
                   <ul className="list-group list-group-flush">
                     <li className="list-group-item px-4">
-                      <span
-                        className="text-dark text-bold mdweight primary"
-                        style={{ fontSize: "1.256rem", fontWeight: 700 }}
-                      >
-                        {post.name}
-                      </span>
+                      <span className="headingText primary">{post.name}</span>
                     </li>{" "}
-                    <li className="list-group-item px-4">
-                      <strong className="text-dark d-block mb-2">
+                    <li className="list-group-item pb-2 pt-2 px-4">
+                      <span
+                        className="descriptionText d-block mb-0"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
                         Location
-                      </strong>
-                      <span className="text-dark mdweight">
+                      </span>
+                      <span className="descriptionText">
                         {post.area + " " + post.city}
                       </span>
                     </li>
-                    <li className="list-group-item px-4">
-                      <strong className="text-dark d-block mb-2">
+                    <li className="list-group-item pb-2 pt-2 px-4">
+                      <span
+                        className="descriptionText d-block mb-0"
+                        style={{ fontWeight: "600", color: "#000" }}
+                      >
                         Address
-                      </strong>
-                      <span className="text-dark mdweight">{post.address}</span>
+                      </span>
+                      <span className="descriptionText">{post.address}</span>
                     </li>
-                    <li className="list-group-item px-4">
+                    <li className="list-group-item pb-3 pt-3 px-4">
                       {post.days.map((day, id) => (
-                        <strong key={id} className="text-dark font-weight-bold">
-                          {day + " "}
-                        </strong>
+                        <span key={id} className="days mr-2">
+                          {day.toUpperCase() + " "}
+                        </span>
                       ))}
                       <div className="mt-2">
-                        <span className="text-dark mdweight">
+                        <span className="days mr-2">
                           {post.from > 12
                             ? post.from - 12 + " PM"
                             : post.from + " AM"}{" "}
@@ -228,16 +226,12 @@ class Doctor extends Component {
                             ? post.to - 12 + " PM"
                             : post.to + " AM"}
                         </span>
+                        <span className="days">{post.fee + " Taka"}</span>
                       </div>
-                    </li>
-                    <li className="list-group-item px-4">
-                      <span className="text-dark mdweight">
-                        {post.fee + " Taka"}
-                      </span>
                     </li>
                     {Object.keys(this.state.appointment).length > 0 ? (
                       <li className="list-group-item px-4">
-                        <strong className="text-dark d-block mb-2">
+                        <strong className="descriptionText d-block mb-2">
                           Current Serials
                         </strong>
                         <div className="row serialrow">
@@ -262,9 +256,7 @@ class Doctor extends Component {
                                   <span
                                     className="card-post__author-avatar card-post__author-avatar--small"
                                     style={{
-                                      backgroundImage: `url(${
-                                        this.props.auth.user.picture
-                                      })`
+                                      backgroundImage: `url(${this.props.auth.user.picture})`
                                     }}
                                   />
                                 </div>
@@ -284,9 +276,7 @@ class Doctor extends Component {
                       </li>
                     ) : (
                       <li className="list-group-item px-4">
-                        <span className="text-danger font-weight-bold">
-                          No Appointments
-                        </span>
+                        <span className="descriptionText">No Appointments</span>
                       </li>
                     )}
                     <li className="list-group-item px-4">
@@ -297,10 +287,8 @@ class Doctor extends Component {
                               className="p-3 mt-3 border rounded"
                               style={{ textAlign: "left" }}
                             >
-                              <h5 className="text-dark mdweight">
-                                Confirmation
-                              </h5>
-                              <span className="text-dark mdweight">
+                              <h5 className="headingText">Confirmation</h5>
+                              <span className="descriptionText">
                                 Do you comfirm your appointment ?
                               </span>
                               <button

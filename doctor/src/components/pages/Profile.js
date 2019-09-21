@@ -1,125 +1,37 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import PlacesAutocomplete from "react-places-autocomplete"; // getSelection // geocodeByAddress,
 import PropTypes from "prop-types";
 import {
   updateUserProfile,
-  getCurrentProfile,
   getProfileByOid
 } from "../../actions/profileAction";
 import { Link, withRouter } from "react-router-dom";
-import { Collapse, Modal } from "shards-react";
-import { cities } from "../../utils/cities";
 import { categories } from "../../utils/categories";
 import TextFieldGroup from "../common/TextFieldGroup";
-import Checkboxes from "../common/Checkboxes";
 import Spinner from "../common/Spinner";
 import classnames from "classnames";
-import TimeKeeper from "react-timekeeper";
 
 class Profile extends Component {
   constructor() {
     super();
     this.state = {
-      userID: "",
-      name: "",
-      email: "",
-      picture: "",
-      area: "asdsad",
-      diabetic: false,
-      hypertension: false,
-      hypotension: false,
       phone: "",
-      age: "",
       gender: "",
-      height: "",
-      weight: "",
-      city: "",
-      smoker: false,
-      address: " ",
-      description: "",
-      bloodGroup: "",
-      errors: {},
-      open: false,
-      stime: false,
-      etime: false,
-      startTime: "12:15 am",
-      endTime: "12:15 am",
-      displayTimepicker: false
+      category: "",
+      specializations: "",
+      education: "",
+      designation: ""
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSelect = this.handleSelect.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.onCheck = this.onCheck.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.toggle = this.toggle.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
-    this.toggleTimeKeep = this.toggleTimeKeep.bind(this);
-    this.toggleTimekeeper = this.toggleTimekeeper.bind(this);
   }
-
-  toggle(e) {
-    e.preventDefault();
-    this.setState({
-      open: !this.state.open
-    });
-  }
-
-  handleTimeChange(newTime) {
-    if (this.state.stime) this.setState({ startTime: newTime.formatted });
-    else if (this.state.etime) this.setState({ endTime: newTime.formatted });
-  }
-
-  toggleTimeKeep(e) {
-    this.setState({
-      displayTimepicker: !this.state.displayTimepicker,
-      [e.target.name]: true
-    });
-    console.log(this.state.stime);
-  }
-
-  toggleTimekeeper() {
-    this.setState({
-      displayTimepicker: !this.state.displayTimepicker,
-      stime: false,
-      etime: false
-    });
-  }
-
-  handleChange = area => {
-    this.setState({ area });
-  };
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
     console.log(this.state);
   }
 
-  handleSelect = area => {
-    this.setState({ area });
-    // geocodeByAddress(address)
-    //   .then(results => getSelection(results[0]))
-    //   .then(latLng => console.log("Success", latLng))
-    //   .catch(error => console.error("Error", error));
-  };
-
-  onCheck(e) {
-    if (e.target.name === "hypertension") {
-      this.setState({ hypertension: !this.state.hypertension });
-    } else if (e.target.name === "hypotension") {
-      this.setState({ hypotension: !this.state.hypotension });
-    } else if (e.target.name === "diabetic") {
-      this.setState({ diabetic: !this.state.diabetic });
-    } else if (e.target.name === "smoker") {
-      this.setState({ smoker: !this.state.smoker });
-    }
-    console.log(this.state);
-  }
-
   componentDidMount() {
-    this.setState({ area: "" });
-
     if (this.props.auth.isAuthenticated) {
       this.props.getProfileByOid(
         this.props.auth.user.oid,
@@ -128,7 +40,6 @@ class Profile extends Component {
       );
     } else if (!this.props.auth.isAuthenticated) {
       this.props.history.push("/createprofile");
-      console.log("hello");
     }
   }
 
@@ -136,13 +47,18 @@ class Profile extends Component {
     e.preventDefault();
     const userData = {
       phone: this.state.phone,
-      area: this.state.area,
       gender: this.state.gender,
-      city: this.state.city,
-      address: this.state.address
+      category: this.state.category,
+      education: this.state.education,
+      designation: this.state.designation,
+      specializations: this.state.specializations
     };
 
-    this.props.updateUserProfile(userData);
+    this.props.updateUserProfile(
+      userData,
+      this.props.history,
+      this.props.location
+    );
   }
 
   render() {
@@ -162,17 +78,7 @@ class Profile extends Component {
       userImage = require("../../images/user.png");
     }
 
-    let {
-      age,
-      phone,
-      key,
-      gender,
-      bloodGroup,
-      height,
-      weight,
-      city,
-      address
-    } = "";
+    let { phone, key, gender, city, avgrating } = "";
 
     if (
       this.props.docprofile.profiles === null ||
@@ -187,8 +93,7 @@ class Profile extends Component {
     } else {
       phone = this.props.docprofile.profiles[0].phone;
       gender = this.props.docprofile.profiles[0].gender;
-      city = this.props.docprofile.profiles[0].city;
-      address = this.props.docprofile.profiles[0].address;
+      avgrating = this.props.docprofile.profiles[0].avgrating;
       profileContents = (
         <div className="main-content-container container-fluid px-4">
           <div className="page-header row no-gutters py-4">
@@ -200,8 +105,46 @@ class Profile extends Component {
           <div className="row">
             <div className="col-lg-7">
               <div className="card card-small mb-4">
-                <div className="card-header border-bottom">
-                  <h6 className="m-0">Account Details</h6>
+                <div
+                  className="card-header border-bottom"
+                  style={{
+                    display: "flex"
+                  }}
+                >
+                  <div>
+                    <img
+                      className="rounded-circle docProfileImage"
+                      src={user.picture}
+                      alt=""
+                    />{" "}
+                  </div>
+                  <div
+                    style={{
+                      flexGrow: 9,
+                      textAlign: "left",
+                      marginLeft: "1rem"
+                    }}
+                  >
+                    <label className="descriptionText m-0">
+                      {"Rating : " + avgrating}
+                    </label>
+                    <div className="progress-wrapper">
+                      <div className="progress progress-md">
+                        <div
+                          className={classnames("progress-bar", {
+                            goodRating: avgrating > 7,
+                            medRating: avgrating > 5 && avgrating <= 7,
+                            badRating: avgrating <= 5
+                          })}
+                          role="progressbar"
+                          aria-valuenow={74}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          style={{ width: avgrating * 10 + "%" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item p-3">
@@ -272,15 +215,17 @@ class Profile extends Component {
                             <div className="form-group col-md-6">
                               <label htmlFor="feInputCity">Category</label>
                               <select
-                                id="feInputCity"
+                                id="feInputCategory"
                                 defaultValue={
                                   this.props.docprofile.profiles[0].category
                                 }
                                 className="form-control"
-                                name="city"
+                                name="category"
                                 onChange={this.onChange}
                               >
-                                <option value="DEFAULT">{city}</option>
+                                <option value="DEFAULT">
+                                  {this.props.docprofile.profiles[0].category}
+                                </option>
                                 {categories.map(function(name, index) {
                                   return <option key={index}>{name}</option>;
                                 })}
@@ -294,7 +239,7 @@ class Profile extends Component {
                               </label>
                               <input
                                 type="text"
-                                name="address"
+                                name="specializations"
                                 className="form-control"
                                 id="feInputAddress"
                                 defaultValue={
@@ -313,7 +258,7 @@ class Profile extends Component {
                                 type="text"
                                 id="feInputEducation"
                                 className="form-control"
-                                name="description"
+                                name="education"
                                 onChange={this.onChange}
                                 defaultValue={
                                   this.props.docprofile.profiles[0].education
@@ -327,7 +272,7 @@ class Profile extends Component {
                                 type="text"
                                 id="feInputDesignation"
                                 className="form-control"
-                                name="description"
+                                name="designation"
                                 onChange={this.onChange}
                                 defaultValue={
                                   this.props.docprofile.profiles[0].designation
@@ -353,7 +298,7 @@ class Profile extends Component {
             <div className="col-lg-5">
               {this.props.docprofile.profiles[0].chambers.map(
                 (chamber, key) => (
-                  <div className="card card-small mb-4">
+                  <div className="card card-small mb-4" key={key}>
                     <div style={{ textAlign: "left" }}>
                       <ul className="list-group list-group-flush">
                         <li
@@ -368,7 +313,7 @@ class Profile extends Component {
                             style={{ width: "50%", textAlign: "right" }}
                           >
                             <i
-                              class="fas fa-edit"
+                              className="fas fa-edit"
                               style={{
                                 paddingTop: "3px"
                               }}
@@ -438,7 +383,6 @@ class Profile extends Component {
 }
 
 Profile.propTypes = {
-  getCurrentProfile: PropTypes.func.isRequired,
   updateUserProfile: PropTypes.func.isRequired,
   getProfileByOid: PropTypes.func.isRequired
 };
@@ -452,5 +396,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getCurrentProfile, updateUserProfile, getProfileByOid }
+  { updateUserProfile, getProfileByOid }
 )(withRouter(Profile));

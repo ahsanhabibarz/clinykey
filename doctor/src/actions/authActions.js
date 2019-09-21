@@ -3,7 +3,7 @@ import setAuthToken from "../utils/setAuthToken";
 import jwt_decode from "jwt-decode";
 import { getProfileByOid } from "../actions/profileAction";
 
-import { GET_ERRORS, SET_CURRENT_USER, GET_PROFILE } from "./types";
+import { GET_ERRORS, SET_CURRENT_USER, GET_DOCTORS_PROFILES } from "./types";
 
 export const loginUser = (userData, history, location) => dispatch => {
   axios
@@ -40,6 +40,7 @@ export const setCurrentUser = decoded => {
 export const logoutUser = history => dispatch => {
   // Remove token from localStorage
   localStorage.removeItem("jwtToken");
+  localStorage.removeItem("mydocprofile");
   // Remove auth header for future requests
   setAuthToken(false);
   // Set current user to {} which will set isAuthenticated to false
@@ -60,7 +61,7 @@ export const logoutUserOnTime = () => dispatch => {
 
 export const removeProfile = () => {
   return {
-    type: GET_PROFILE,
+    type: GET_DOCTORS_PROFILES,
     payload: null
   };
 };
